@@ -1,0 +1,29 @@
+version: '3.9'
+
+services:
+  rates:
+    container_name: ratesapp
+    build: ./rates
+    environment:
+      - POSTGRES_HOST=db
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: on-failure
+    ports:
+          - 3000:3000
+    env_file:
+      - dev.env
+  db:
+    container_name: ratesdb
+    build: ./db
+    env_file:
+      - dev.env
+
+    restart: always
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
